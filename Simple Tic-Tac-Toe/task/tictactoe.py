@@ -9,11 +9,15 @@ class TicTacToe:
             contains the cells of the game and their current status.
             It is stored as 3 nested lists, one per row.
             Accepted symbols are 'X', 'O' and '_'.
+        turn : str
+            stores the next turn 'X' or 'O'
     """
 
     def __init__(self):
         """The constructor to initialize the object."""
-        self.grid = []
+        empty_row = ['_', '_', '_']
+        self.grid = [list(empty_row), list(empty_row), list(empty_row)]
+        self.turn = 'X'  # first player is 'X'
 
     def update(self, cells):
         """
@@ -29,7 +33,8 @@ class TicTacToe:
     def new_move(self, row, column):
         """
         Updates the grid with the new move passed in arguments 'row'-'column' and
-        returns if move is valid or not.
+        returns if move is valid or not. Each new move is assigned to the next player
+        'X' or 'O'.
 
         Parameters:
             row : str
@@ -42,11 +47,13 @@ class TicTacToe:
                 True if valid move, False if invalid move
         """
         valid = False
+
         try:
             if self.grid[int(row) - 1][int(column) - 1] in ('X', 'O'):
                 print("This cell is occupied! Choose another one!")
             else:
-                self.grid[int(row) - 1][int(column) - 1] = "X"
+                self.grid[int(row) - 1][int(column) - 1] = self.turn
+                self.turn = 'O' if self.turn == 'X' else 'X'  # update next player
                 valid = True
         except (TypeError, ValueError):
             print("You should enter numbers!")
@@ -58,7 +65,12 @@ class TicTacToe:
     def result(self):
         """
         Analyzes the grid to print the game result.
+
+        Return:
+            finished : bool
+                True if game is finished
         """
+        finished = False
         x_wins = False
         o_wins = False
         empty_cells = False
@@ -94,18 +106,20 @@ class TicTacToe:
                 all(cell == 'O' for cell in (self.grid[0][2], self.grid[1][1], self.grid[2][0])):
             o_wins = True
 
-        # Print result
+        # Analyze result
         if (x_wins and o_wins) or (x_total > o_total + 1) or (o_total > x_total + 1):
             print("Impossible")
-        elif not x_wins and not o_wins:
-            if empty_cells:
-                print("Game not finished")
-            else:
-                print("Draw")
+        elif not empty_cells and not x_wins and not o_wins:
+            print("Draw")
+            finished = True
         elif x_wins:
             print("X wins")
+            finished = True
         elif o_wins:
             print("O wins")
+            finished = True
+
+        return finished
 
     def __str__(self):
         """
@@ -119,11 +133,9 @@ class TicTacToe:
 
 
 game = TicTacToe()
-
-cells = input("Enter cells: ")
-game.update(cells)
 print(game)
 
+# Game loop
 while True:
     valid_move = False
     move = input("Enter the coordinates: ").split()
@@ -132,7 +144,6 @@ while True:
     except TypeError:
         print("You should enter numbers!")
     if valid_move:
-        break
-print(game)
-
-# game.result()
+        print(game)
+        if game.result():
+            break
