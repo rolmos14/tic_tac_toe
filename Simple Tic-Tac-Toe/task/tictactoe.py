@@ -4,12 +4,11 @@ class TicTacToe:
 
     ...
 
-    Attributes
-    ----------
+    Attributes:
         grid : list
             contains the cells of the game and their current status.
-            It is stored as 3 nested lists, one per row
-            Accepted symbols are 'X', 'O' and '_'
+            It is stored as 3 nested lists, one per row.
+            Accepted symbols are 'X', 'O' and '_'.
     """
 
     def __init__(self):
@@ -20,13 +19,41 @@ class TicTacToe:
         """
         Updates the grid with the new status passed in argument 'cells'.
 
-        Parameters
-        ----------
-        cells : str
-            Status of all the cells of the game.
-            Accepted symbols are 'X', 'O' and '_'
+        Parameters:
+            cells : str
+                Status of all the cells of the game.
+                Accepted symbols are 'X', 'O' and '_'.
         """
         self.grid = [list(cells[0:3]), list(cells[3:6]), list(cells[6:9])]
+
+    def new_move(self, row, column):
+        """
+        Updates the grid with the new move passed in arguments 'row'-'column' and
+        returns if move is valid or not.
+
+        Parameters:
+            row : str
+                Row coordinate. Accepted values '1' to '3'
+            column : str
+                Columns coordinate. Accepted values '1' to '3'
+
+        Return:
+            valid : bool
+                True if valid move, False if invalid move
+        """
+        valid = False
+        try:
+            if self.grid[int(row) - 1][int(column) - 1] in ('X', 'O'):
+                print("This cell is occupied! Choose another one!")
+            else:
+                self.grid[int(row) - 1][int(column) - 1] = "X"
+                valid = True
+        except (TypeError, ValueError):
+            print("You should enter numbers!")
+        except IndexError:
+            print("Coordinates should be from 1 to 3!")
+
+        return valid
 
     def result(self):
         """
@@ -85,14 +112,27 @@ class TicTacToe:
         Return a representation of the current status of the game.
         """
         line_of_dashes = 9 * "-"
-        row_1 = f"| {self.grid[0][0]} {self.grid[0][1]} {self.grid[0][2]} |"
-        row_2 = f"| {self.grid[1][0]} {self.grid[1][1]} {self.grid[1][2]} |"
-        row_3 = f"| {self.grid[2][0]} {self.grid[2][1]} {self.grid[2][2]} |"
-        return line_of_dashes + "\n" + row_1 + "\n" + row_2 + "\n" + row_3 + "\n" + line_of_dashes
+        row_1 = "| " + " ".join(self.grid[0]) + " |"
+        row_2 = "| " + " ".join(self.grid[1]) + " |"
+        row_3 = "| " + " ".join(self.grid[2]) + " |"
+        return "\n".join([line_of_dashes, row_1, row_2, row_3, line_of_dashes])
 
 
 game = TicTacToe()
+
 cells = input("Enter cells: ")
 game.update(cells)
 print(game)
-game.result()
+
+while True:
+    valid_move = False
+    move = input("Enter the coordinates: ").split()
+    try:
+        valid_move = game.new_move(*move)
+    except TypeError:
+        print("You should enter numbers!")
+    if valid_move:
+        break
+print(game)
+
+# game.result()
